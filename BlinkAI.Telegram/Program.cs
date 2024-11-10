@@ -15,6 +15,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<ITelegramBotClient>(provider =>
 	new TelegramBotClient(builder.Configuration["BotToken"]));
 
+builder.Services.AddSingleton<AiProxy>();
+
 // Register the BotHostedService
 builder.Services.AddHostedService<BotHostedService>();
 
