@@ -1,0 +1,17 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!--Generator: Xara Designer (www.xara.com), SVG filter version: 6.6.0.9-->
+<svg fill="none" fill-rule="evenodd" stroke="black" stroke-width="0.501" stroke-linejoin="bevel" stroke-miterlimit="10" font-family="Times New Roman" font-size="16" style="font-variant-ligatures:none" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" overflow="visible" width="197.862pt" height="55.07pt" viewBox="4980.75 -1574.57 197.862 55.07">
+ <defs>
+  <style type="text/css">@import url('https://themes.googleusercontent.com/fonts/css?family=Montserrat Alternates:600');
+@import url('https://themes.googleusercontent.com/fonts/css?family=Open Sans:400,600');</style>
+ </defs>
+ <g id="Layer 1" transform="scale(1 -1)">
+  <text xml:space="preserve" transform="translate(5047.7 1530.31) scale(1 -1)" kerning="auto" fill="#ffffff" font-size="50.152" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.254" stroke="none" letter-spacing="-0.02em" font-family="Montserrat Alternates SemiBold"><tspan x="0" y="0">Blink</tspan></text>
+  <g id="Group" fill="#ffffff" stroke-linejoin="miter" stroke-linecap="round" stroke="none" stroke-width="53.153">
+   <path d="M 5002.81,1519.5 L 5002.81,1537.55 L 5011.58,1537.55 L 5011.58,1519.5 L 5002.81,1519.5 Z M 5002.81,1556.53 L 5002.81,1574.57 L 5011.58,1574.57 L 5011.58,1556.53 L 5002.81,1556.53 Z" marker-start="none" marker-end="none"/>
+   <path d="M 5029.58,1530.42 L 5013.58,1538.75 L 5017.65,1546.54 L 5033.64,1538.2 L 5029.58,1530.42 Z M 4996.74,1547.54 L 4980.75,1555.88 L 4984.81,1563.66 L 5000.8,1555.32 L 4996.74,1547.54 Z" marker-start="none" marker-end="none"/>
+   <path d="M 5033.25,1556.96 L 5017.61,1547.97 L 5013.23,1555.58 L 5028.86,1564.58 L 5033.25,1556.96 Z M 5001.14,1538.5 L 4985.51,1529.49 L 4981.14,1537.11 L 4996.77,1546.1 L 5001.14,1538.5 Z" marker-start="none" marker-end="none"/>
+  </g>
+ </g>
+</svg>

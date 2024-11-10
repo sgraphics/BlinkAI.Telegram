@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Text.RegularExpressions;
 using Azure.AI.OpenAI;
 using Telegram.Bot;
@@ -21,8 +22,7 @@ public class BotHostedService : BackgroundService
 		public string? State { get; set; }
 	}
 
-	private ConcurrentDictionary<long, (SortedList<DateTimeOffset, Message>, IList<ChatRequestMessage>, Subject<string>)> _data
-		= new ConcurrentDictionary<long, (SortedList<DateTimeOffset, Message> history, IList<ChatRequestMessage> internalHistory, Subject<string> currentChat)>();
+	private ConcurrentDictionary<long, (SortedList<DateTimeOffset, Message> history, IList<ChatRequestMessage> internalHistory, Subject<string> currentChat, StringBuilder currentMessage)> _data = new();
 
 	private readonly ITelegramBotClient _botClient;
 	private readonly Gpt _gpt;
@@ -35,7 +35,7 @@ public class BotHostedService : BackgroundService
 		{
 			RowKey = "ec33bdf3-a15b-4062-afda-04ea7562f3b8",
 			Address = "0x7a542eebbcc66adbaa8c4b6c8eda4eb11ff5f424",
-			ContractsData = "[{\"Name\":\"blinkai_rental_contract\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_auction_workflow\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_nft_flow_simple\",\"CanExecute\":true,\"CanPrepare\":true}]",
+			ContractsData = "[{\"Name\":\"blinkai_rental_contract\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_auction_workflow\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_nft_flow_simple\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_chartity_and_donation\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_escrow_contract\",\"CanExecute\":true,\"CanPrepare\":true},{\"Name\":\"blinkai_fund_transfer\",\"CanExecute\":true,\"CanPrepare\":true}]",
 			Key = "18d65db2ec8c097b3c9876452c2ffb238d23a617b22810a49e7c642cfd3f3fb1",
 			Name = "My super assistant",
 			Url = "https://chatgpt.com/g/g-djTbLhSz0-my-super-assistant"
@@ -61,7 +61,7 @@ public class BotHostedService : BackgroundService
 
 	private async Task<string?> SendMessage(long chatId, string? message)
 	{
-		var (messageHistory, records, _) = _data[chatId];
+		var (messageHistory, records, _, _) = _data[chatId];
 		try
 		{
 			if (string.IsNullOrWhiteSpace(message))
@@ -71,7 +71,7 @@ public class BotHostedService : BackgroundService
 
 			var newChat = message;
 
-			messageHistory.Add(DateTimeOffset.Now, new Message(message ?? string.Empty, DateTimeOffset.Now, Guid.NewGuid().ToString(), true, true));
+			messageHistory.Add(DateTimeOffset.Now, new Message(message, DateTimeOffset.Now, Guid.NewGuid().ToString(), true, true));
 
 			var isPrompt = false;
 			var prompt = string.Empty;
@@ -131,11 +131,11 @@ Short Description of Blink:
 
 	async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 	{
-		if (update.Type == UpdateType.Message && update.Message is not null)
+		if (update is { Type: UpdateType.Message, Message: not null })
 		{
 			var message = update.Message;
 
-			var data = _data.GetOrAdd(message.Chat.Id, _ => (new SortedList<DateTimeOffset, Message>(), new List<ChatRequestMessage>(), new Subject<string>()));
+			var data = _data.GetOrAdd(message.Chat.Id, _ => (new SortedList<DateTimeOffset, Message>(), new List<ChatRequestMessage>(), new Subject<string>(), new StringBuilder()));
 
 			if (message.Text == "/start")
 			{
@@ -144,7 +144,7 @@ Short Description of Blink:
 					cancellationToken: cancellationToken);
 
 				var switched = data.Item3
-					.Select(param => Observable.FromAsync(() => SendMessage(message.Chat.Id, param))) // Pass the emitted string to GetString
+					.Select(param => Observable.FromAsync(() => SendMessage(message.Chat.Id, param)))
 					.Switch();
 
 				//Dont care about idisposable??
@@ -168,7 +168,10 @@ Short Description of Blink:
 						{
 							new[]
 							{
-								InlineKeyboardButton.WithCallbackData(buttonType == "open" ? "Open transaction" : "Execute transaction", transactionId)
+								InlineKeyboardButton.WithWebApp(
+									buttonType == "open" ? "Open transaction" : "Execute transaction",
+									"https://www.blinkai.xyz/tran/" + transactionId
+								)
 							}
 						});
 					}
@@ -188,30 +191,12 @@ Short Description of Blink:
 				data.Item3.OnNext(message.Text);
 			}
 		}
-		else if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery is not null)
+		else if (update is { Type: UpdateType.CallbackQuery, CallbackQuery: not null })
 		{
 			var callbackQuery = update.CallbackQuery;
-			await botClient.AnswerCallbackQuery(
-				callbackQuery.Id,
-				$"You picked {callbackQuery.Data}",
-				cancellationToken: cancellationToken
-			);
-
 			await botClient.SendMessage(
 				chatId: callbackQuery.Message.Chat.Id,
 				text: $"User {callbackQuery.From.Username} clicked on {callbackQuery.Data}",
-				cancellationToken: cancellationToken
-			);
-
-			await botClient.SendMessage(
-				chatId: callbackQuery.Message.Chat.Id,
-				text: "Hello, World!",
-				replyMarkup: new InlineKeyboardMarkup(
-					InlineKeyboardButton.WithWebApp(
-						"Open WebApp",
-						"https://www.blinkai.xyz/transaction/6936ce6d-4fbb-4416-adf9-83d5863dd804"
-					)
-				),
 				cancellationToken: cancellationToken
 			);
 		}

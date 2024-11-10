@@ -350,6 +350,7 @@ namespace BlinkAI.Telegram
 					.SetQueryParams(queryParams)
 					.WithOAuthBearerToken(gpt.RowKey)
 					.WithHeader("openai-gpt-id", gpt.Url)
+					.WithHeader("network", "BinanceTestnet")
 					.GetJsonAsync<dynamic>();
 				return JsonSerializer.Serialize(response);
 			}
@@ -361,6 +362,7 @@ namespace BlinkAI.Telegram
 					.SetQueryParams(queryParams)
 					.WithOAuthBearerToken(gpt.RowKey)
 					.WithHeader("openai-gpt-id", gpt.Url)
+					.WithHeader("network", "BinanceTestnet")
 					.PostJsonAsync(bodyParams)
 					.ReceiveJson<dynamic>();
 				return JsonSerializer.Serialize(response);
